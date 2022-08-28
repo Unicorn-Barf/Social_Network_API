@@ -52,10 +52,52 @@ const updateUserById = async (req, res) => {
 const deleteUserById = async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.userId);
+        // delete associated thoughts
+        await Thought.deleteMany({username: deletedUser.username});
         res.status(200).json(deletedUser);
       } catch (error) {
         res.status(500).json({error});
       };
+};
+
+// Add a friend to the friends array by ID
+const addFriend = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.userId,
+            {
+                $addToSet: {
+                    friends: req.params.friendId,
+                },
+            },
+            {
+                new: true,
+            },
+        );
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error });
+    };
+};
+
+// Remove a friend from friends array by ID
+const deleteFriend = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.userId,
+            {
+                $pull: {
+                    friends: req.params.friendId,
+                },
+            },
+            {
+                new: true,
+            },
+        );
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error });
+    };
 };
 
 module.exports = {
@@ -64,4 +106,6 @@ module.exports = {
     getUserById,
     updateUserById,
     deleteUserById,
+    addFriend,
+    deleteFriend,
 };

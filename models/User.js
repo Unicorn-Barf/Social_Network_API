@@ -6,12 +6,12 @@ const userSchema = new Schema(
             type: String,
             unique: true,
             trim: true,
-            required: [true, 'Must provide a username!']
+            required: [true, 'Must provide a unique username!']
         },
         email: {
             type: String,
             unique: true,
-            required: [true, 'Must provide an email!'],
+            required: [true, 'Must provide a unique email!'],
             match: /^[a-z\d_\.-]+@[a-z\d\.-]+\.[a-z\.]{2,6}$/,
         },
         thoughts: [
