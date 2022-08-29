@@ -42,8 +42,23 @@ const updateUserById = async (req, res) => {
                 new: true,
             },
         );
+        // Update thoughs and comments if changing username
+        if (req.body.username) {
+            // update thoughts
+            for (let i=0; i < user.thoughts.length; i++) {
+                const oldThought = await Thought.findOne({ _id: user.thoughts[i] });
+                for (let i=0; i < oldThought.reactions.length; i++) {
+                    if (oldThought.reactions[i].username === oldThought.username) {
+                        reaction.username = req.body.username;
+                    }
+                }
+                oldThought.username = req.body.username;
+                oldThought.save();
+            };
+        }
         res.status(200).json(user);
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error });
     };
 };
@@ -53,11 +68,11 @@ const deleteUserById = async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.userId);
         // delete associated thoughts
-        await Thought.deleteMany({username: deletedUser.username});
+        await Thought.deleteMany({ username: deletedUser.username });
         res.status(200).json(deletedUser);
-      } catch (error) {
-        res.status(500).json({error});
-      };
+    } catch (error) {
+        res.status(500).json({ error });
+    };
 };
 
 // Add a friend to the friends array by ID

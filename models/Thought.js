@@ -17,9 +17,19 @@ const reactionSchema = new Schema(
             type: String,
             required: true,
             
-        }
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now(),
+            get: formatTimestamp,
+        },
+    },
+    {
+        toJSON: {
+            getters: true
+        },
+        id: false,
     }
-
 );
 
 const thoughtSchema = new Schema(
@@ -44,6 +54,7 @@ const thoughtSchema = new Schema(
     {
         toJSON: {
             virtuals: true,
+            getters: true
         },
         id: false,
     }
@@ -57,7 +68,9 @@ thoughtSchema.virtual('reactionCount').get(function () {
 // Getter function to format the 'createdAt' timestamp
 // ex. Result August 22, 2020 at 6:45 PM
 function formatTimestamp(createdAt) {
-    return `${(new Date(createdAt)).toLocaleDateString([], { dateStyle: 'long' })} at ${(new Date(createdAt)).toLocaleTimeString([], { timeStyle: 'short' })}`;
+    const date = createdAt.toLocaleDateString([], { dateStyle: 'long' });
+    const time = createdAt.toLocaleTimeString([], { timeStyle: 'short' });
+    return `${date} at ${time}`;
 };
 
 module.exports = model('Thought', thoughtSchema);
